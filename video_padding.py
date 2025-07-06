@@ -9,6 +9,11 @@ def deleting_temps():
         for file in os.listdir("frame"):
             os.remove(os.path.join("frame", file))
         os.rmdir("frame")
+    # Delete output_frames directory if it exists
+    if os.path.exists("output_frames"):
+        for file in os.listdir("output_frames"):
+            os.remove(os.path.join("output_frames", file))
+        os.rmdir("output_frames")
     if os.path.exists("op.avi"):
         os.remove("op.avi")
 
@@ -69,18 +74,21 @@ def add_audio_to_mp4(input_video, input_audio, output_video):
     # Add audio to the final MP4 using ffmpeg
     os.system(f"ffmpeg -y -i {input_video} -i {input_audio} -c:v copy -c:a aac -strict experimental -map 0:v:0 -map 1:a:0 -shortest {output_video}")
 
-if __name__ == "__main__":
-    print("""
- █ █▀▄▀█ █▀▀ █▀█ █░█ █▀▀ █▀█ █░░ ▄▀█ █▄█
- █ █░▀░█ █▄█ █▄█ ▀▄▀ ██▄ █▀▄ █▄▄ █▀█ ░█░
- """)
-    
-    try:
-        # Predefined input file names
-        inp_file_name = "input.mp4"
-        output_folder = "out"
-        os.makedirs(output_folder, exist_ok=True)
 
+def padding_with_black(inp_file_name):
+    """
+    Pads the input video with black background and overwrites the original file.
+    Args:
+        inp_file_name (str): Path to the input video file (e.g., 'downloads/input.mp4')
+    """
+    output_folder = os.path.dirname(inp_file_name)
+    if output_folder == "":
+        output_folder = "."
+    temp_audio_path = os.path.join(output_folder, "temp_audio.aac")
+    temp_result_path = os.path.join(output_folder, "result.mp4")
+    temp_final_path = os.path.join(output_folder, "final_with_audio.mp4")
+
+    try:
         # Calculate FPS and extract frames
         fps, no_of_frames = calc_fps(inp_file_name)
         ext_frames(inp_file_name)
@@ -99,15 +107,19 @@ if __name__ == "__main__":
         con2video(fps, black_bg.shape[1], black_bg.shape[0])
 
         # Convert AVI to MP4 (video only)
-        cvn2mp4()
+        os.makedirs(output_folder, exist_ok=True)
+        os.system(f"ffmpeg -y -i op.avi -ac 2 -b:v 2000k -c:a aac -c:v libx264 -b:a 160k -vprofile high -bf 0 -strict experimental -f mp4 {temp_result_path}")
 
         # Extract audio from the original video
-        os.system(f"ffmpeg -y -i {inp_file_name} -vn -acodec aac out/temp_audio.aac")
+        os.system(f"ffmpeg -y -i {inp_file_name} -vn -acodec aac {temp_audio_path}")
 
         # Add audio to the final MP4
-        add_audio_to_mp4("out/result.mp4", "out/temp_audio.aac", "out/final_with_audio.mp4")
+        add_audio_to_mp4(temp_result_path, temp_audio_path, temp_final_path)
 
-        print("Video is ready in the out folder as final_with_audio.mp4.")
+        # Overwrite the original file with the padded video
+        os.replace(temp_final_path, inp_file_name)
+
+        print(f"Video with black padding saved and overwritten: {inp_file_name}")
 
     except Exception as e:
         print(f"Something went wrong: {e}")
@@ -116,6 +128,10 @@ if __name__ == "__main__":
     finally:
         # Clean up temporary files
         deleting_temps()
-        # Optionally, remove the temporary audio file
-        if os.path.exists("out/temp_audio.aac"):
-            os.remove("out/temp_audio.aac")
+        # Optionally, remove the temporary audio and result files
+        if os.path.exists(temp_audio_path):
+            os.remove(temp_audio_path)
+        if os.path.exists(temp_result_path):
+            os.remove(temp_result_path)
+        if os.path.exists(temp_final_path):
+            os.remove(temp_final_path)

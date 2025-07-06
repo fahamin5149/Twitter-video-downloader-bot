@@ -9,7 +9,7 @@ from tqdm import tqdm
 from pathlib import Path
 import random
 import string
-
+from video_padding import padding_with_black
 
 def download_video(url, file_name) -> None:
     """Download a video from a URL into a filename.
@@ -31,6 +31,8 @@ def download_video(url, file_name) -> None:
             progress_bar.update(len(data))
             file.write(data)
 
+    padding_with_black(inp_file_name=download_path)
+    
     progress_bar.close()
     print("Video downloaded successfully!")
 

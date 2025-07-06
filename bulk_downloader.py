@@ -1,6 +1,6 @@
 import subprocess
 import sys
-from google_drive import upload_videos_to_drive
+# from google_drive import upload_videos_to_drive
 
 
 def bulk_download_twitter_videos(urls):
@@ -46,11 +46,8 @@ if __name__ == "__main__":
 
     urls_to_download = [
 "https://x.com/wushtini/status/1941418899377094924",
-"https://x.com/lfcmarkk/status/1941436966903701973",
-"https://x.com/mateo91218_/status/1941558863653933275",
-"https://x.com/BarcaSpaces/status/1941498990824128641",
-"https://x.com/SibiLFC/status/1941478132713930890"
-    ]
+"https://x.com/lfcmarkk/status/1941436966903701973"
+]
 
     bulk_download_twitter_videos(urls_to_download)
         
