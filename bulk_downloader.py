@@ -59,6 +59,4 @@ if __name__ == "__main__":
     #football
     local_path = r"C:\Users\user\Downloads\videos"
     folder_name = "politics"
-    # upload_videos_to_drive(local_path, folder_name)
-
     
