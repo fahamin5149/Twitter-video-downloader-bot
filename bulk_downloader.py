@@ -50,7 +50,6 @@ if __name__ == "__main__":
 "https://x.com/mateo91218_/status/1941558863653933275",
 "https://x.com/BarcaSpaces/status/1941498990824128641",
 "https://x.com/SibiLFC/status/1941478132713930890"
-
     ]
 
     bulk_download_twitter_videos(urls_to_download)
